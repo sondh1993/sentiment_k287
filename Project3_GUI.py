@@ -5,8 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-from pandas_profiling import ProfileReport
-plt.style.use('ggplot')
 from underthesea import word_tokenize, pos_tag, sent_tokenize
 import re
 import streamlit as st
