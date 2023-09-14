@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import time
-from underthesea import word_tokenize, pos_tag, sent_tokenize
+# from underthesea import word_tokenize, pos_tag, sent_tokenize
 import re
 import streamlit as st
 # đọc file 
