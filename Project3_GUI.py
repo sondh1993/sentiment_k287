@@ -45,7 +45,7 @@ elif choice== "EDA":
     st.pyplot(plt)
 
     st.markdown("Biểu đồ phần trăm sentiment")
-    sentiment_counts = data['sentiment'].value_counts()
+    sentiment_counts = df_sub['sentiment'].value_counts()
     labels = sentiment_counts.index
     sizes = (sentiment_counts / sentiment_counts.sum()) * 100
     # Vẽ biểu đồ tròn
