@@ -60,8 +60,9 @@ elif choice== "EDA":
     # Hiển thị biểu đồ
     st.pyplot(fig)
 
-    content = df_sub['words']
-    all_words = ' '.join(content).split()
-    word_counts = Counter(all_words)
-    temp = pd.DataFrame(word_counts.most_common(20), columns=['Word', 'Count'])
-    st.dataframe(temp.style.background_gradient(cmap='viridis'))
+    # Biểu đồ tương quan (Correlation matrix)
+    st.write("Biểu đồ tương quan:")
+    fig, ax = plt.subplots()
+    correlation_matrix = data.corr()
+    sns.heatmap(correlation_matrix, annot=True)
+    st.pyplot(fig)
