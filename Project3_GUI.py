@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 plt.style.use('ggplot')
-import underthesea
-from underthesea import word_tokenize, pos_tag, sent_tokenize
 import re
 import streamlit as st
 
