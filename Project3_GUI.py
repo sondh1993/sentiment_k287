@@ -43,20 +43,18 @@ elif choice== "EDA":
     ax.bar_label(ax.containers[0], labels=abs_value)
     # Hiển thị biểu đồ
     st.pyplot(plt)
+
     st.markdown("Biểu đồ phần trăm sentiment")
-    sentiment_counts = df_sub['sentiment'].value_counts()
+    sentiment_counts = data['sentiment'].value_counts()
     labels = sentiment_counts.index
     sizes = (sentiment_counts / sentiment_counts.sum()) * 100
-
     # Vẽ biểu đồ tròn
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
     # Vẽ vòng tròn trong để tạo thành biểu đồ tròn
     circle = plt.Circle((0, 0), 0.7, fc='white')
-    fig = plt.gcf()
-    fig.gca().add_artist(circle)
-
+    ax.add_artist(circle)
+    # Đảm bảo biểu đồ tròn không bị méo
+    ax.axis('equal')
     # Hiển thị biểu đồ
-    plt.axis('equal')  # Đảm bảo biểu đồ tròn không bị méo
-    plt.show()
-    st.pyplot()
+    st.pyplot(fig)
