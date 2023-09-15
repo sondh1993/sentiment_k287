@@ -8,6 +8,7 @@ import time
 plt.style.use('ggplot')
 import re
 import streamlit as st
+from collections import Counter
 
 st.set_page_config(page_title="Sentiment Analysis", page_icon="📈")
 data = pd.read_csv('Sendo_reviews.csv')
@@ -58,3 +59,9 @@ elif choice== "EDA":
     ax.axis('equal')
     # Hiển thị biểu đồ
     st.pyplot(fig)
+
+    content = df_sub['content']  
+    all_words = ' '.join(content).split()  
+    word_counts = Counter(all_words)  
+    temp = pd.DataFrame(word_counts.most_common(20), columns=['Word', 'Count'])
+    st.dataframe(temp.style.background_gradient(cmap='viridis'))
