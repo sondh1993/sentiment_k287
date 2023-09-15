@@ -60,7 +60,7 @@ elif choice== "EDA":
     # Hiển thị biểu đồ
     st.pyplot(fig)
 
-    content = data['words']  
+    content = df_sub['content']  
     all_words = ' '.join(content).split()  
     word_counts = Counter(all_words)  
     temp = pd.DataFrame(word_counts.most_common(20), columns=['Word', 'Count'])
