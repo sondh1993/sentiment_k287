@@ -63,6 +63,6 @@ elif choice== "EDA":
     # Biểu đồ tương quan (Correlation matrix)
     st.write("Biểu đồ tương quan:")
     fig, ax = plt.subplots()
-    correlation_matrix = data.corr()
+    correlation_matrix = df_sub.corr()
     sns.heatmap(correlation_matrix, annot=True)
     st.pyplot(fig)
