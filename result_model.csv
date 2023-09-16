@@ -1,0 +1,9 @@
+,Model,Recall Score,Precision Score,F1-Score,Accuracy on Test,Accuracy on Train,Time Process
+0,MultinomialNB,0.87,0.87,0.87,0.87,0.88,0.09
+1,LogisticRegression,0.9,0.9,0.9,0.9,0.93,1.02
+2,DecisionTreeClassifier,0.88,0.88,0.88,0.88,0.97,0.48
+3,RandomForestClassifier,0.89,0.89,0.89,0.89,0.97,2.92
+4,SVC,0.89,0.89,0.89,0.89,0.95,14.24
+5,GradientBoostingClassifier,0.89,0.89,0.89,0.89,0.93,45.6
+6,AdaBoostClassifier,0.85,0.85,0.85,0.85,0.88,5.53
+7,MLPClassifier,0.88,0.88,0.88,0.88,0.97,37.75
