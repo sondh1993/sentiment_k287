@@ -31,6 +31,7 @@ maxtrix = vec.fit_transform(X['words'])
 label_encoder = LabelEncoder()
 y = label_encoder.fit_transform(y)
 
+
 # GUI
 menu = ["Business Objective", "EDA", "Build Project", "New Prediction"]
 choice = st.sidebar.selectbox('Menu', menu)
@@ -95,4 +96,4 @@ elif choice== "EDA":
     st.subheader('top 10 words and their frequencies')
     st.image('top10word.png', use_column_width=True)
 elif choice== "Build Project":
-    
+    st.dataframe(X)
