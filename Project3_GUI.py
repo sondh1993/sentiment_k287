@@ -98,6 +98,6 @@ elif choice== "EDA":
     st.subheader('top 10 words and their frequencies')
     st.image('top10word.png', use_column_width=True)
 elif choice== "Build Project":
-    df_results = pd.read_csv("result.csv")
+    df_results = pd.read_csv("result_model.csv")
     st.table(df_results)
     
