@@ -107,3 +107,10 @@ elif choice== "EDA":
 
     st.subheader('Top 10 Words - Negative Sentiment')
     st.bar_chart(frequencies_negative, labels=words_negative)
+    # Display word cloud for positive text
+    st.subheader('Word Cloud - Positive Sentiment')
+    st.image('wordcloud_positive.png', use_column_width=True)
+
+    # Display word cloud for negative text
+    st.subheader('Word Cloud - Negative Sentiment')
+    st.image('wordcloud_negative.png', use_column_width=True)
