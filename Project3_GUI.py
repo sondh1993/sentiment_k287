@@ -38,7 +38,7 @@ elif choice== "EDA":
     df_sub = pd.read_csv('project3_clean.csv')
     st.title("Exploratory Data Analysis")
     st.subheader("Dữ Liệu được cung cấp:")
-    st.dataframe(data.head())
+    st.dataframe(data)
     st.write("After data preprocessing:")
     st.dataframe(df_sub.sample(20))
     st.title("Biểu đồ đếm số lượng sentiment")
