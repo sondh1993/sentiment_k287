@@ -10,6 +10,8 @@ import re
 import streamlit as st
 from collections import Counter
 import sys
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
 
 st.set_page_config(page_title="Sentiment Analysis", page_icon="📈")
 data = pd.read_csv('Sendo_reviews.csv')
@@ -83,3 +85,13 @@ elif choice== "EDA":
     # Display top 10 words and their frequencies
     st.subheader('top 10 words and their frequencies')
     st.image('top10word.png', use_column_width=True)
+elif choice== "Build Project":
+    df_sub = pd.read_csv('project3_clean.csv')
+    X = df_sub.drop(['sentiment'],axis=1)
+    y = df_sub['sentiment']
+    # Khởi tạo vectorizer
+    vec = TfidfVectorizer()
+    maxtrix = vec.fit_transform(X['words'])
+
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(y)
