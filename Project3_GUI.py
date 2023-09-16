@@ -35,7 +35,7 @@ if choice =="Business Objective":
 elif choice== "EDA":
     df_sub = pd.read_csv('project3_clean.csv')
     st.header("Exploratory Data Analysis")
-    st.title("Dữ Liệu đưuọc cung cấp:")
+    st.title("Dữ Liệu được cung cấp:")
     st.dataframe(data.head())
     st.write("After data preprocessing:")
     st.dataframe(df_sub.sample(20))
