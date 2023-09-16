@@ -36,7 +36,7 @@ elif choice== "EDA":
     st.header("Exploratory Data Analysis")
     st.write("After data preprocessing:")
     st.dataframe(df_sub.sample(20))
-    st.markdown("Biểu đồ đếm số lượng sentiment")
+    st.title("Biểu đồ đếm số lượng sentiment")
     # Tạo biểu đồ đếm số lượng các giá trị trong cột "sentiment"
     ax = sns.countplot(x=df_sub['sentiment'], order=df_sub['sentiment'].value_counts(ascending=True).index)
     # Thêm nhãn số lượng lên trên các cột
@@ -45,7 +45,7 @@ elif choice== "EDA":
     # Hiển thị biểu đồ
     st.pyplot(plt)
 
-    st.markdown("Biểu đồ phần trăm sentiment")
+    st.title("Biểu đồ phần trăm sentiment")
     sentiment_counts = df_sub['sentiment'].value_counts()
     labels = sentiment_counts.index
     sizes = (sentiment_counts / sentiment_counts.sum()) * 100
@@ -61,7 +61,7 @@ elif choice== "EDA":
     st.pyplot(fig)
     
     # Biểu đồ tương quan (Correlation matrix)
-    st.write("Top 10 customer with the most review")
+    st.title("Top 10 customer with the most review")
     # Group data by customer_id and count reviews
     review_counts = data['customer_id'].value_counts()
 
