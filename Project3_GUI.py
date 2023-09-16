@@ -42,8 +42,13 @@ if choice =="Business Objective":
     st.subheader("Project: Sentiment Analysis")
     st.write(""" Xây dựng mô hình dự đoán:  
     - giúp người bán hàng có thể biết được những phản hồi nhanh chóng của khách hàng về sản phẩm hay dịch vụ của họ (tích cực, tiêu cực hay trung tính), 
-    - điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm """)
-    st.subheader("- Giáo viên hướng dẫn: Khuất Thùy Phương\n- Học viên: Đặng Huỳnh Sơn")
+    - điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm
+             
+             
+             
+              """)
+    st.subheader("- Giáo viên hướng dẫn: Khuất Thùy Phương\n \
+                 - Học viên: Đặng Huỳnh Sơn")
     
     st.markdown("Dữ Liệu :")
     
