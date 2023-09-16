@@ -102,5 +102,5 @@ elif choice== "Build Project":
     st.table(df_results)
     # Display top model 
     st.subheader('Result Model RandomForestClassifier')
-    st.image('top10word.png', use_column_width=True)
+    st.image('test.png', use_column_width=True)
     
