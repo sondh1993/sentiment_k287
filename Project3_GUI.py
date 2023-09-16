@@ -49,10 +49,7 @@ if choice =="Business Objective":
               """)
     st.subheader("- Giáo viên hướng dẫn: Khuất Thùy Phương\n \
                  - Học viên: Đặng Huỳnh Sơn")
-    
-    st.markdown("Dữ Liệu :")
-    
-    st.dataframe(data.head())
+    st.image('logo.jpg')
     
 elif choice== "EDA":
     df_sub = pd.read_csv('project3_clean.csv')
