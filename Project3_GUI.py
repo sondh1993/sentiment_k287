@@ -79,3 +79,7 @@ elif choice== "EDA":
     # Display word cloud for negative text
     st.subheader('Word Cloud - Negative Sentiment')
     st.image('Word Cloud - Negative Sentiment.png', use_column_width=True)
+
+    # Display top 10 words and their frequencies
+    st.subheader('top 10 words and their frequencies')
+    st.image('top10word.png', use_column_width=True)
