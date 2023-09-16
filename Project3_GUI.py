@@ -100,4 +100,7 @@ elif choice== "EDA":
 elif choice== "Build Project":
     df_results = pd.read_csv("result_model.csv")
     st.table(df_results)
+    # Display top model 
+    st.subheader('Result Model RandomForestClassifier')
+    st.image('top10word.png', use_column_width=True)
     
