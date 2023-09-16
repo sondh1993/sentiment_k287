@@ -12,6 +12,17 @@ from collections import Counter
 import sys
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+from sklearn.naive_bayes import MultinomialNB, GaussianNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier, ExtraTreesClassifier
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import accuracy_score, recall_score,classification_report, confusion_matrix, precision_score, f1_score
 
 st.set_page_config(page_title="Sentiment Analysis", page_icon="📈")
 data = pd.read_csv('Sendo_reviews.csv')
@@ -97,3 +108,61 @@ elif choice== "Build Project":
 
     label_encoder = LabelEncoder()
     y = label_encoder.fit_transform(y)
+    df_tfidf = pd.DataFrame(maxtrix.toarray(), columns=vec.get_feature_names_out())
+    X_train , X_test , y_train , y_test = train_test_split(df_tfidf,y, test_size=0.25, random_state=42)
+    def run_all_sentiment_analysis_models1(X_train, X_test, y_train, y_test ):
+        models = [
+            MultinomialNB(),
+            LogisticRegression(),
+            DecisionTreeClassifier(),
+            RandomForestClassifier(),
+            SVC(),
+            GradientBoostingClassifier(),
+            AdaBoostClassifier(),
+            MLPClassifier(),
+        ]
+        
+        results = []
+        saved_models = {}
+        for model in models:
+            t0 = time.time()
+            model_name = model.__class__.__name__
+            print("Model:", model_name)
+            print("_" * 50)
+            model.fit(X_train, y_train)
+            # Lưu mô hình
+            model_path = model_name + '_model.pkl'
+            # Lưu đường dẫn của mô hình đã lưu
+            saved_models[model_name] = model_path
+            save_model(model, model_path)
+            y_pred = model.predict(X_test)
+
+            # Perform evaluation and calculate scores
+            recall = round(recall_score(y_test, y_pred, average='micro'), 2)
+            precision = round(precision_score(y_test, y_pred, average='micro'), 2)
+            f1 = round(f1_score(y_test, y_pred, average='micro'), 2)
+            accuracy_train = round(accuracy_score(y_train, model.predict(X_train)), 2)
+            accuracy_test = round(accuracy_score(y_test, y_pred), 2)
+            t1 = time.time()
+            end = round(t1 - t0, 2)
+            
+            # Append results to the list
+            results.append({
+                'Model': model_name,
+                'Recall Score': recall,
+                'Precision Score': precision,
+                'F1-Score': f1,
+                'Accuracy on Test': accuracy_test,
+                'Accuracy on Train': accuracy_train,
+                'Time Process': end
+            })
+            print("*" * 50)
+            print(model_name, "Time Process:", end, "Seconds")
+        
+        # Create a dataframe from the results
+        df_results = pd.DataFrame(results)
+        return df_results
+    # Run all sentiment analysis models and collect results
+    df_results = run_all_sentiment_analysis_models1(X_train, X_test, y_train, y_test )
+    st.dataframe(df_results)
+
