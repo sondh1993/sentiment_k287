@@ -164,5 +164,5 @@ elif choice== "Build Project":
         return df_results
     # Run all sentiment analysis models and collect results
     df_results = run_all_sentiment_analysis_models1(X_train, X_test, y_train, y_test )
-    st.dataframe(df_results)
-
+    st.table(df_results)
+    
