@@ -21,15 +21,6 @@ if uploaded_file is not None:
     data = pd.read_csv(uploaded_file, encoding='latin-1')
     data.to_csv("project3.csv", index = False)
 
-df_sub = pd.read_csv('project3_clean.csv')
-X = df_sub.drop(['sentiment'],axis=1)
-y = df_sub['sentiment']
-# Khởi tạo vectorizer
-vec = TfidfVectorizer()
-maxtrix = vec.fit_transform(X['words'])
-
-label_encoder = LabelEncoder()
-y = label_encoder.fit_transform(y)
 
 
 # GUI
@@ -96,4 +87,13 @@ elif choice== "EDA":
     st.subheader('top 10 words and their frequencies')
     st.image('top10word.png', use_column_width=True)
 elif choice== "Build Project":
-    st.dataframe(X)
+    df_sub = pd.read_csv('project3_clean.csv')
+    df_sub = df_sub.dropna()
+    X = df_sub.drop(['sentiment'],axis=1)
+    y = df_sub['sentiment']
+    # Khởi tạo vectorizer
+    vec = TfidfVectorizer()
+    maxtrix = vec.fit_transform(X['words'])
+
+    label_encoder = LabelEncoder()
+    y = label_encoder.fit_transform(y)
