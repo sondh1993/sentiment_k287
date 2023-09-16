@@ -9,6 +9,8 @@ plt.style.use('ggplot')
 import re
 import streamlit as st
 from collections import Counter
+import sys
+!{sys.executable} -m pip install wordcloud
 from wordcloud import WordCloud
 
 st.set_page_config(page_title="Sentiment Analysis", page_icon="📈")
