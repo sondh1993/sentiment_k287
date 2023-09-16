@@ -59,10 +59,12 @@ elif choice== "EDA":
     ax.axis('equal')
     # Hiển thị biểu đồ
     st.pyplot(fig)
-
+    
     # Biểu đồ tương quan (Correlation matrix)
-    st.write("Biểu đồ tương quan:")
-    fig, ax = plt.subplots()
-    correlation_matrix = df_sub.corr()
-    sns.heatmap(correlation_matrix, annot=True)
-    st.pyplot(fig)
+    st.write("Top 10 customer with the most review")
+    # Group data by customer_id and count reviews
+    review_counts = data['customer_id'].value_counts()
+
+    # Get the top 10 customers with the most reviews
+    top_customers = review_counts.head(10)
+    st.bar_chart(top_customers)
