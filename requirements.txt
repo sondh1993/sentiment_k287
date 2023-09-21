@@ -3,4 +3,8 @@ numpy
 pandas
 matplotlib
 seaborn
+pandas_profiling
 scikit-learn
+wordcloud
+time
+re
