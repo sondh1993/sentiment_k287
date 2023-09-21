@@ -1,111 +1,241 @@
 import warnings
 warnings.filterwarnings("ignore")
+import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from wordcloud import WordCloud
+import f_clean_test
 import time
-plt.style.use('ggplot')
-import re
-import streamlit as st
-from collections import Counter
-import sys
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.naive_bayes import MultinomialNB, GaussianNB
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier, ExtraTreesClassifier
-from sklearn.svm import SVC
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.metrics import accuracy_score, recall_score,classification_report, confusion_matrix, precision_score, f1_score
 
-st.set_page_config(page_title="Sentiment Analysis", page_icon="📈")
-data = pd.read_csv('Sendo_reviews.csv')
-# Upload file
-uploaded_file = st.file_uploader("Choose a file", type=['csv'])
-if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file, encoding='latin-1')
-    data.to_csv("project3.csv", index = False)
+def file_to_dict(path):
+    file = open(path, 'r', encoding = 'utf-8')
+    lst = file.read().split('\n')
+    dict = {}
+    for line in lst:
+        key, value = line.split('\t')
+        dict[key] = str(value)
+    return dict
+def file_to_list(path):
+    file = open(path, 'r', encoding = 'utf-8')
+    lst = file.read().split('\n')
+    return lst
+# Thêm các file dùng để clean dữ liệu
+emoji_dict = file_to_dict(r'emojicon.txt')
+teen_dict = file_to_dict(r'teencode.txt')
+envi_dict = file_to_dict(r'english-vnmese.txt')
+wrong_lst = file_to_list(r'wrong-word.txt')
+stop_lst = file_to_list(r'vietnamese-stopwords.txt')
+positive_emoji_dict = file_to_list(r'positive_emojis_list.txt')
+negative_emoji_dict = file_to_list(r'negative_emojis_list.txt')
 
+positive_words_dict = file_to_list(r'positive_words_list.txt')
+negative_words_dict = file_to_list(r'negative_words_list.txt')
 
+# file có sẵn clean text
+emoji_dict = file_to_dict(r'emojicon.txt')
+teen_dict = file_to_dict(r'teencode.txt')
+envi_dict = file_to_dict(r'english-vnmese.txt')
+# Trang 1: Giới thiệu tổng quát về model
+def page_intro():
+    st.title("Project : Dự đoán Sentiment")
+    st.write("Ứng dụng này sử dụng mô hình để dự đoán cảm xúc (sentiment) \n- Dữ liệu được lấy từ sendo, gồm những đánh giá của khách hàng")
+    st.image("logo.jpg")
+    # Thêm thông tin giới thiệu khác (tuỳ chọn)
+    st.markdown("### Giáo viên hướng dẫn :\nKhuất Thùy Dương")
+    st.markdown("### Học viên :\nĐặng Huỳnh Sơn")
+# Trang 2: Tìm hiểu thuật toán và phân tích dữ liệu
+def page_algorithm():
+    st.title("Phân tích Khám phá Dữ liệu - EDA")
+    st.write("Trang này cung cấp thông tin về thuật toán được sử dụng và phân tích dữ liệu.")
+    # Thêm thông tin về thuật toán và phân tích dữ liệu (tuỳ chọn)
+    # Lựa chọn tệp tin
+    uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
+    read_data = pd.read_csv("Sendo_reviews.csv")
+    # Đọc dữ liệu từ tệp tin hoặc sử dụng dữ liệu mặc định
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+    else:
+        df = read_data
+    df = pd.DataFrame(df)
+    # Hiển thị dữ liệu
+    st.write("Dữ liệu được đọc:")
+    st.write(df)
+    st.write("Một số thông tin từ dữ liệu qua biểu đồ")
+    ax = df['rating'].value_counts().sort_index().plot(kind='bar',
+                                                       title='Count of Reviews by Rating', figsize=(10,5))
+    ax.set_xlabel("Review Rating")
+    # Tạo biểu đồ cột
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ax = df['rating'].value_counts().sort_index().plot(kind='bar', title='Count of Reviews by Rating')
+    ax.set_xlabel("Review Rating")
 
-# GUI
-menu = ["Business Objective", "EDA", "Build Project", "New Prediction"]
-choice = st.sidebar.selectbox('Menu', menu)
-if choice =="Business Objective":
-    st.title("Data Project 3")
-    st.subheader("Project: Sentiment Analysis")
-    st.write(""" Xây dựng mô hình dự đoán:  
-    - giúp người bán hàng có thể biết được những phản hồi nhanh chóng của khách hàng về sản phẩm hay dịch vụ của họ (tích cực, tiêu cực hay trung tính), 
-    - điều này giúp cho người bán biết được tình hình kinh doanh, hiểu được ý kiến của khách hàng từ đó giúp họ cải thiện hơn trong dịch vụ, sản phẩm
-             
-             
-             
-              """)
-    st.subheader("- Giáo viên hướng dẫn: Khuất Thùy Phương\n \
-                 - Học viên: Đặng Huỳnh Sơn")
-    st.image('logo.jpg')
-    
-elif choice== "EDA":
-    df_sub = pd.read_csv('project3_clean.csv')
-    st.title("Exploratory Data Analysis")
-    st.subheader("Dữ Liệu được cung cấp:")
-    st.dataframe(data)
-    st.write("After data preprocessing:")
-    st.dataframe(df_sub.sample(20))
-    st.title("Biểu đồ đếm số lượng sentiment")
-    # Tạo biểu đồ đếm số lượng các giá trị trong cột "sentiment"
-    ax = sns.countplot(x=df_sub['sentiment'], order=df_sub['sentiment'].value_counts(ascending=True).index)
-    # Thêm nhãn số lượng lên trên các cột
-    abs_value = df_sub['sentiment'].value_counts(ascending=True).values
-    ax.bar_label(ax.containers[0], labels=abs_value)
-    # Hiển thị biểu đồ
-    st.pyplot(plt)
+    # Hiển thị giá trị con số trên biểu đồ
+    for p in ax.patches:
+        ax.annotate(str(p.get_height()), (p.get_x() + p.get_width() / 2, p.get_height()), ha='center', va='bottom')
 
-    st.title("Biểu đồ phần trăm sentiment")
-    sentiment_counts = df_sub['sentiment'].value_counts()
-    labels = sentiment_counts.index
-    sizes = (sentiment_counts / sentiment_counts.sum()) * 100
-    # Vẽ biểu đồ tròn
-    fig, ax = plt.subplots()
-    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
-    # Vẽ vòng tròn trong để tạo thành biểu đồ tròn
-    circle = plt.Circle((0, 0), 0.7, fc='white')
-    ax.add_artist(circle)
-    # Đảm bảo biểu đồ tròn không bị méo
-    ax.axis('equal')
-    # Hiển thị biểu đồ
+    # Hiển thị biểu đồ trong Streamlit
+    st.pyplot(fig)
+    # Top 10 khách hàng đánh giá nheieuf
+    top_customer = df.groupby("customer_id")['rating'].count().sort_values(ascending=False).head(10)
+    # Tạo biểu đồ cột bằng Seaborn
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.barplot(x=top_customer.values, y=top_customer.index, ax=ax)
+    # Thiết lập nhãn và tiêu đề
+    ax.set_xlabel('Purchase Count')
+    ax.set_ylabel('Customer')
+    ax.set_title('Top 10 Customers with Highest comment Count')
+    # Hiển thị biểu đồ trong Streamlit
     st.pyplot(fig)
     
-    # Biểu đồ tương quan (Correlation matrix)
-    st.title("Top 10 customer with the most review")
-    # Group data by customer_id and count reviews
-    review_counts = data['customer_id'].value_counts()
+    # Nối tất cả các nội dung thành một chuỗi
+    text = ' '.join(df['content'].astype(str))
 
-    # Get the top 10 customers with the most reviews
-    top_customers = review_counts.head(10)
-    st.bar_chart(top_customers)
- 
-    # Display word cloud for positive text
-    st.subheader('Word Cloud - Positive Sentiment')
-    st.image('Word Cloud - Positive Sentiment.jpg', use_column_width=True)
+    # Tạo word cloud
+    wordcloud = WordCloud(width=900, height=400, background_color='white').generate(text)
 
-    # Display word cloud for negative text
-    st.subheader('Word Cloud - Negative Sentiment')
-    st.image('Word Cloud - Negative Sentiment.png', use_column_width=True)
+    # Hiển thị word cloud trong Streamlit
+    st.title('Word Cloud của Content')
+    st.image(wordcloud.to_array(), use_column_width=True)
 
-    # Display top 10 words and their frequencies
-    st.subheader('top 10 words and their frequencies')
-    st.image('top10word.png', use_column_width=True)
-elif choice== "Build Project":
-    df_results = pd.read_csv("result_model.csv")
-    st.table(df_results)
-    # Display top model 
-    st.subheader('Result Model RandomForestClassifier')
-    st.image('test.png', use_column_width=True)
+    # Tính phần trăm của các sentiment
+    rating_count = df['rating'].value_counts()
+    rating_percen = rating_count / rating_count.sum() * 100
+    labels = rating_percen.index
+    sizes = rating_percen.values
+
+    # Vẽ biểu đồ hình tròn
+    sns.set_palette("Set3")  # Đặt màu sắc cho biểu đồ
+    fig, ax = plt.subplots()
+    ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')  # Đảm bảo biểu đồ tròn không bị méo
+
+    # Hiển thị biểu đồ trong Streamlit
+    st.pyplot(fig)
+
+    st.markdown('''### Qua sơ lược các biểu đồ như trên có thể nhận xét như sau:
+- Các content nghiêng về tích cực.
+- Nhóm khách hàng đánh giá nhiều lần cho thấy không phải bot.
+- Trước khi bắt đầu train dữ liệu dự đoán, tiến hành làm sạch dữ liệu.''')
+    
+    st.markdown("## Data Cleaning ")
+    st.write('Chọn 2 đặc trưng cần thiết để giữ lại content và rating')
+    df_sub = df[['content','rating']].copy()
+    st.dataframe(df_sub.head(10))
+    
+    # Xử lý dữ liệu
+    df_sub['words'] = df_sub['content'].apply(lambda x: f_clean_test.pre_text(str(x), emoji_dict, teen_dict, wrong_lst))
+    df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.loaddicchar(str(x)))
+    df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.translate_text(x))
+
+    # Hiển thị quá trình xử lý dữ liệu
+    progress_bar = st.empty()
+    progress_text = st.empty()
+
+    # Tính toán số lượng từ và emoji mang tính cảm xúc
+    for i in range(len(df_sub)):
+        # Cập nhật quá trình xử lý
+        progress_bar.progress((i + 1) / len(df_sub))
+        progress_text.text(f"Đang xử lý dòng thứ {i + 1}/{len(df_sub)}")
+
+        # Xử lý từng dòng dữ liệu
+        row = df_sub.iloc[i]
+        row['positive_words_count'] = f_clean_test.count_value_text(str(row['words']), positive_words_dict)
+        row['positive_emoji_count'] = f_clean_test.count_value_text(str(row['words']), positive_emoji_dict)
+        row['negative_words_count'] = f_clean_test.count_value_text(str(row['words']), negative_words_dict)
+        row['negative_emoji_count'] = f_clean_test.count_value_text(str(row['words']), negative_emoji_dict)
+
+        row['words'] = f_clean_test.word_tokenize(str(row['words']))
+        row['words'] = f_clean_test.process_postag_thesea(str(row['words']))
+        row['words'] = f_clean_test.remove_stop(str(row['words']), stop_lst)
+
+        row['words_length'] = len(str(row['words']).split())
+        row['positive'] = row['positive_emoji_count'] + row['positive_words_count']
+        row['negative'] = row['negative_emoji_count'] + row['negative_words_count']
+        row['rating_new'] = row['rating'] + 1 if row['positive'] > row['negative'] else row['rating'] - 1
+        row['sentiment'] = 'positive' if row['rating_new'] >= 4 else 'negative'
+
+        # Tạm ngừng để hiển thị hiệu ứng loading
+        time.sleep(0.5)
+
+    # Xóa quá trình xử lý khi hoàn thành
+    progress_bar.empty()
+    progress_text.empty()
+
+    st.title("Word Cloud and Bar Plot")
+
+    # # Generate word clouds from positive, negative, and neutral text
+    # sentiments = ['positive', 'negative']
+    # wordclouds = {}
+    # for sentiment in sentiments:
+    #     wordcloud = WordCloud(background_color='white', collocations=False).generate(globals()[f'{sentiment}_text'])
+    #     wordclouds[sentiment] = wordcloud
+
+    # # Plot and save word clouds
+    # for sentiment, wordcloud in wordclouds.items():
+    #     plt.figure(figsize=(8, 6))
+    #     plt.imshow(wordcloud, interpolation='bilinear')
+    #     plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
+    #     plt.axis('off')
+    #     st.pyplot(plt)  # Hiển thị word cloud trong Streamlit
+
+    # # Get word frequencies from word clouds
+    # word_freqs = {}
+    # for sentiment, wordcloud in wordclouds.items():
+    #     word_freq = wordcloud.words_
+    #     sorted_word_freq = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+    #     top_words = sorted_word_freq[:10]
+    #     words = [word[0] for word in top_words]
+    #     frequencies = [word[1] for word in top_words]
+    #     word_freqs[sentiment] = (words, frequencies)
+
+    # # Create bar plots for word frequencies in each sentiment
+    # fig, axes = plt.subplots(1, len(sentiments), figsize=(12, 6))
+
+    # for i, sentiment in enumerate(sentiments):
+    #     words, frequencies = word_freqs[sentiment]
+    #     axes[i].bar(words, frequencies)
+    #     axes[i].set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
+    #     axes[i].set_xlabel('Words')
+    #     axes[i].set_ylabel('Frequency')
+    #     axes[i].tick_params(axis='x', rotation=90)
+    #     st.pyplot(fig)
+
+
+# Trang 3: Huấn luyện model và kết quả mẫu
+def page_training():
+    st.title("Huấn luyện model")
+    st.write("Trang này cho phép người dùng lựa chọn thuật toán và xem kết quả mẫu sau huấn luyện.")
+    # Thêm các lựa chọn thuật toán (tuỳ chọn)
+    # Thêm kết quả mẫu dữ liệu thử (tuỳ chọn)
+
+# Trang 4: Người dùng tự nhập
+def page_user_input():
+    st.title("Người dùng tự nhập")
+    st.write("Trang này cho phép người dùng tự nhập văn bản để dự đoán sentiment.")
+    user_input = st.text_area("Nhập văn bản của bạn", "")
+    # Xử lý văn bản người dùng và gọi mô hình để dự đoán sentiment (tuỳ chọn)
+
+# Thiết lập giao diện ứng dụng Streamlit
+def main():
+    # Định cấu hình trang
+    st.set_page_config(page_title="Dự đoán Sentiment", layout="wide")
+
+    # Hiển thị menu điều hướng
+    st.sidebar.title("Menu")
+    page = st.sidebar.radio("Chọn trang", ("Giới thiệu", "Phân tích Khám phá Dữ liệu - EDA", "Huấn luyện model", "Người dùng tự nhập"))
+
+    # Hiển thị trang tương ứng dựa trên lựa chọn
+    if page == "Giới thiệu":
+        page_intro()
+    elif page == "Phân tích Khám phá Dữ liệu - EDA":
+        page_algorithm()
+    elif page == "Huấn luyện model":
+        page_training()
+    elif page == "Người dùng tự nhập":
+        page_user_input()
+
+if __name__ == "__main__":
+    main()
     
