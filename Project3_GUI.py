@@ -254,10 +254,10 @@ def page_algorithm():
     plt.tight_layout()
     st.pyplot(fig)
     
-st.markdown('''- Nhận xét:  
-    - Dữ liệu thiếu khá nhiều, chọn phương án drop dữ liệu , duplicate để lại.  
-    - Dữ liệu sau khi đã xử lý , save lại để dành để train model.  
-    - Qua sơ lược tổng quan vễ dữ liệu, ta có thể thấy được sự mất cân bằng ở cột output "sentiment" ''')
+    st.markdown('''- Nhận xét:  
+        - Dữ liệu thiếu khá nhiều, chọn phương án drop dữ liệu , duplicate để lại.  
+        - Dữ liệu sau khi đã xử lý , save lại để dành để train model.  
+        - Qua sơ lược tổng quan vễ dữ liệu, ta có thể thấy được sự mất cân bằng ở cột output "sentiment" ''')
 
 # Trang 3: Huấn luyện model và kết quả mẫu
 def page_training():
