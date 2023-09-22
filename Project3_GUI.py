@@ -167,6 +167,7 @@ def page_algorithm():
         progress_text.empty()
 
     st.title("Xử lý dữ liệu")
+
     # Tạo nút "Tải lên dữ liệu"
     uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
     if uploaded_file is not None:
@@ -197,6 +198,10 @@ def page_algorithm():
             df_sub.to_csv(processed_file_path, index=False)
 
         st.success("Đã hoàn thành xử lý dữ liệu!")
+
+        # Hiển thị dữ liệu đã xử lý
+        st.subheader("Dữ liệu đã xử lý")
+        st.dataframe(df_sub)
 
     st.title("Word Cloud and Bar Plot")
 
