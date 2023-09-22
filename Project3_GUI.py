@@ -33,75 +33,7 @@ negative_emoji_dict = file_to_list(r'negative_emojis_list.txt')
 
 positive_words_dict = file_to_list(r'positive_words_list.txt')
 negative_words_dict = file_to_list(r'negative_words_list.txt')
-def process_text(df_sub):
-        # Xử lý dữ liệu
-        df_sub['words'] = df_sub['content'].apply(lambda x: f_clean_test.pre_text(str(x), emoji_dict, teen_dict, wrong_lst))
-        df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.loaddicchar(str(x)))
-        df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.translate_text(x))
 
-        # Hiển thị quá trình xử lý dữ liệu
-        progress_bar = st.empty()
-        progress_text = st.empty()
-
-        # Tính toán số lượng từ và emoji mang tính cảm xúc
-        for i in range(len(df_sub)):
-            # Cập nhật quá trình xử lý
-            progress_bar.progress((i + 1) / len(df_sub))
-            progress_text.text(f"Đang xử lý dòng thứ {i + 1}/{len(df_sub)}")
-
-            # Xử lý từng dòng dữ liệu
-            row = df_sub.iloc[i]
-            row['positive_words_count'] = f_clean_test.count_value_text(str(row['words']), positive_words_dict)
-            row['positive_emoji_count'] = f_clean_test.count_value_text(str(row['words']), positive_emoji_dict)
-            row['negative_words_count'] = f_clean_test.count_value_text(str(row['words']), negative_words_dict)
-            row['negative_emoji_count'] = f_clean_test.count_value_text(str(row['words']), negative_emoji_dict)
-
-            row['words'] = f_clean_test.word_tokenize(str(row['words']))
-            row['words'] = f_clean_test.process_postag_thesea(str(row['words']))
-            row['words'] = f_clean_test.remove_stop(str(row['words']), stop_lst)
-
-            row['words_length'] = len(str(row['words']).split())
-            row['positive'] = row['positive_emoji_count'] + row['positive_words_count']
-            row['negative'] = row['negative_emoji_count'] + row['negative_words_count']
-            row['rating_new'] = row['rating'] + 1 if row['positive'] > row['negative'] else row['rating'] - 1
-            row['sentiment'] = 'positive' if row['rating_new'] >= 4 else 'negative'
-
-            # Tạm ngừng để hiển thị hiệu ứng loading
-            time.sleep(0.5)
-
-        # Xóa quá trình xử lý khi hoàn thành
-        progress_bar.empty()
-        progress_text.empty()
-uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
-# Tạo nút "Tải lên dữ liệu"
-if uploaded_file is not None:
-    # Kiểm tra xem có file đã xử lý sẵn hay không
-    processed_file_path = "project3_clean.csv"
-    if os.path.exists(processed_file_path):
-        use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
-        if use_processed_file:
-            # Đọc dữ liệu từ file đã xử lý sẵn
-            df_sub = pd.read_csv(processed_file_path)
-        else:
-            # Đọc dữ liệu từ file tải lên
-            df_sub = pd.read_csv(uploaded_file)
-
-            # Thực hiện xử lý dữ liệu
-            process_text(df_sub)
-
-            # Lưu dữ liệu đã xử lý vào file
-            df_sub.to_csv(processed_file_path, index=False)
-    else:
-        # Đọc dữ liệu từ file tải lên
-        df_sub = pd.read_csv(uploaded_file)
-
-        # Thực hiện xử lý dữ liệu
-        process_text(df_sub)
-
-        # Lưu dữ liệu đã xử lý vào file
-        df_sub.to_csv(processed_file_path, index=False)
-
-    st.success("Đã hoàn thành xử lý dữ liệu!")
 # file có sẵn clean text
 emoji_dict = file_to_dict(r'emojicon.txt')
 teen_dict = file_to_dict(r'teencode.txt')
@@ -121,6 +53,7 @@ def page_algorithm():
     st.write("Trang này cung cấp thông tin về thuật toán được sử dụng và phân tích dữ liệu.")
     # Thêm thông tin về thuật toán và phân tích dữ liệu (tuỳ chọn)
     # Lựa chọn tệp tin
+    uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
     read_data = pd.read_csv("Sendo_reviews.csv")
     # Đọc dữ liệu từ tệp tin hoặc sử dụng dữ liệu mặc định
     if uploaded_file is not None:
@@ -193,15 +126,76 @@ def page_algorithm():
     df_sub = df[['content','rating']].copy()
     st.dataframe(df_sub.head(10))
     
-    
+    def process_text(df_sub):
+        # Xử lý dữ liệu
+        df_sub['words'] = df_sub['content'].apply(lambda x: f_clean_test.pre_text(str(x), emoji_dict, teen_dict, wrong_lst))
+        df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.loaddicchar(str(x)))
+        df_sub['words'] = df_sub['words'].apply(lambda x: f_clean_test.translate_text(x))
+
+        # Hiển thị quá trình xử lý dữ liệu
+        progress_bar = st.empty()
+        progress_text = st.empty()
+
+        # Tính toán số lượng từ và emoji mang tính cảm xúc
+        for i in range(len(df_sub)):
+            # Cập nhật quá trình xử lý
+            progress_bar.progress((i + 1) / len(df_sub))
+            progress_text.text(f"Đang xử lý dòng thứ {i + 1}/{len(df_sub)}")
+
+            # Xử lý từng dòng dữ liệu
+            row = df_sub.iloc[i]
+            row['positive_words_count'] = f_clean_test.count_value_text(str(row['words']), positive_words_dict)
+            row['positive_emoji_count'] = f_clean_test.count_value_text(str(row['words']), positive_emoji_dict)
+            row['negative_words_count'] = f_clean_test.count_value_text(str(row['words']), negative_words_dict)
+            row['negative_emoji_count'] = f_clean_test.count_value_text(str(row['words']), negative_emoji_dict)
+
+            row['words'] = f_clean_test.word_tokenize(str(row['words']))
+            row['words'] = f_clean_test.process_postag_thesea(str(row['words']))
+            row['words'] = f_clean_test.remove_stop(str(row['words']), stop_lst)
+
+            row['words_length'] = len(str(row['words']).split())
+            row['positive'] = row['positive_emoji_count'] + row['positive_words_count']
+            row['negative'] = row['negative_emoji_count'] + row['negative_words_count']
+            row['rating_new'] = row['rating'] + 1 if row['positive'] > row['negative'] else row['rating'] - 1
+            row['sentiment'] = 'positive' if row['rating_new'] >= 4 else 'negative'
+
+            # Tạm ngừng để hiển thị hiệu ứng loading
+            time.sleep(0.5)
+
+        # Xóa quá trình xử lý khi hoàn thành
+        progress_bar.empty()
+        progress_text.empty()
 
     st.title("Xử lý dữ liệu")
+    # Tạo nút "Tải lên dữ liệu"
+    if uploaded_file is not None:
+        # Kiểm tra xem có file đã xử lý sẵn hay không
+        processed_file_path = "project3_clean.csv"
+        if os.path.exists(processed_file_path):
+            use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
+            if use_processed_file:
+                # Đọc dữ liệu từ file đã xử lý sẵn
+                df_sub = pd.read_csv(process_text)
+            else:
+                # Đọc dữ liệu từ file tải lên
+                df_sub = pd.read_csv(uploaded_file)
 
-    
+                # Thực hiện xử lý dữ liệu
+                process_text(df_sub)
 
-    # Hiển thị dữ liệu đã xử lý
-    st.subheader("Dữ liệu đã xử lý")
-    st.dataframe(df_sub)
+                # Lưu dữ liệu đã xử lý vào file
+                df_sub.to_csv(processed_file_path, index=False)
+        else:
+            # Đọc dữ liệu từ file tải lên
+            df_sub = pd.read_csv(uploaded_file)
+
+            # Thực hiện xử lý dữ liệu
+            process_text(df_sub)
+
+            # Lưu dữ liệu đã xử lý vào file
+            df_sub.to_csv(processed_file_path, index=False)
+
+        st.success("Đã hoàn thành xử lý dữ liệu!")
 
     st.title("Word Cloud and Bar Plot")
 
