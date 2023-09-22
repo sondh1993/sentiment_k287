@@ -19,15 +19,19 @@ def missing_value_analysis(df):
     return miss_df
 
 def check_data(df, head=5, tail=5):
-    st.write("SHAPE".center(82, '~'))
+    st.write("~" * 82)
+    st.write("SHAPE".center(82))
     st.write("Rows: {}".format(df.shape[0]))
     st.write("Columns: {}".format(df.shape[1]))
-    st.write("TYPES".center(82, '~'))
+    st.write("~" * 82)
+    st.write("TYPES".center(82))
     st.write(df.info())
-    st.write("".center(82, '~'))
+    st.write("~" * 82)
+    st.write("Missing Values Analysis".center(82))
     miss_df = missing_value_analysis(df)
     st.table(miss_df)
-    st.write("Duplicated values".center(82, '~'))
+    st.write("~" * 82)
+    st.write("Duplicated values".center(82))
     st.write(df.duplicated().sum())
 def file_to_dict(path):
     file = open(path, 'r', encoding = 'utf-8')
