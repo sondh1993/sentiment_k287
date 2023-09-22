@@ -121,7 +121,6 @@ def page_algorithm():
     st.write("Trang này cung cấp thông tin về thuật toán được sử dụng và phân tích dữ liệu.")
     # Thêm thông tin về thuật toán và phân tích dữ liệu (tuỳ chọn)
     # Lựa chọn tệp tin
-    uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
     read_data = pd.read_csv("Sendo_reviews.csv")
     # Đọc dữ liệu từ tệp tin hoặc sử dụng dữ liệu mặc định
     if uploaded_file is not None:
