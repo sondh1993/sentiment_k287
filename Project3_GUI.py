@@ -216,7 +216,7 @@ def page_algorithm():
     wordclouds = {}
 
     for sentiment in sentiments:
-        sentiment_text = ' '.join(df[df['sentiment'] == sentiment]['content'])
+        sentiment_text = ' '.join(df_sub[df_sub['sentiment'] == sentiment]['content'])
         wordcloud = WordCloud(background_color='white', collocations=False).generate(sentiment_text)
         wordclouds[sentiment] = wordcloud
 
