@@ -22,6 +22,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression
 import xgboost as xgb
 from imblearn.over_sampling import RandomOverSampler
+import emoji
 
 def missing_value_analysis(df):
     na_col = [col for col in df.columns if df[col].isnull().sum() > 0]
@@ -291,23 +292,151 @@ def page_training():
     X_resampled , y_resampled = ros.fit_resample(X,y)
     st.markdown("### After process data:")
     st.write(y_resampled.value_counts())
-    # Thêm các lựa chọn thuật toán (tuỳ chọn)
-    # Menu chọn thuật toán
-    algorithms = ["Thuật toán A", "Thuật toán B", "Thuật toán C"]
-    selected_algorithm = st.selectbox("Chọn thuật toán", algorithms)
+    label_encoder = LabelEncoder()
+    y_encoder = label_encoder.fit_transform(y_resampled)
+    # Khởi tạo vectorizer
+    vec = TfidfVectorizer()
+    matrix = vec.fit_transform(X_resampled['words'])
 
-    # # Tải mô hình khi có lựa chọn thuật toán
-    # if st.button("Tải mô hình"):
-    #     load_model(selected_algorithm)
-    #     st.success("Mô hình đã được tải thành công!")
-    # Thêm kết quả mẫu dữ liệu thử (tuỳ chọn)
+    joblib.dump(vec,'TfidfVectorizer.pkl')
+    df_tfidf = pd.DataFrame(matrix.toarray(), columns=vec.get_feature_names_out())
+    X_tf = pd.concat([X_resampled.drop('words', axis=1), df_tfidf], axis=1)
+    st.dataframe(X_tf)
+    def train_model(X_train, X_test, y_train, y_test, model_name):
+        if model_name == 'XGBoost':
+            model = xgb.XGBClassifier()
+        elif model_name == 'Decision Tree':
+            model = DecisionTreeClassifier()
+        elif model_name == 'SVM (linear kernel)':
+            model = SVC(kernel='linear')
+            model = SVC(kernel='poly')
+        elif model_name == 'SVM (RBF kernel)':
+            model = SVC(kernel='rbf')
+        elif model_name == 'Ensemble (Voting)':
+            model = VotingClassifier(estimators=[
+                ('lr', LogisticRegression()),
+                ('rf', RandomForestClassifier()),
+                ('svc', SVC())
+            ])
+        elif model_name == 'Ensemble (Bagging)':
+            model = BaggingClassifier(base_estimator=DecisionTreeClassifier(), n_estimators=10)
+        elif model_name == 'Ensemble (AdaBoost)':
+            model = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(), n_estimators=10)
+        elif model_name == 'MultinomialNB':
+            model = MultinomialNB()
+
+        start_time = time.time()
+
+        # Huấn luyện mô hình
+        model.fit(X_train, y_train)
+
+        # Thời gian chạy mô hình
+        elapsed_time = time.time() - start_time
+
+        # Dự đoán nhãn cho tập kiểm tra
+        y_pred = model.predict(X_test)
+
+        # Tính toán các số liệu đánh giá
+        accuracy = accuracy_score(y_test, y_pred)
+        precision = precision_score(y_test, y_pred, average='weighted')
+        recall = recall_score(y_test, y_pred, average='weighted')
+        f1 = f1_score(y_test, y_pred, average='weighted')
+
+        # Lưu mô hình
+        model_filename = model_name.replace(' ', '_') + '.pkl'
+        joblib.dump(model, model_filename)
+        st.write(f"Time processed {model_name} : {round(elapsed_time, 2)} seconds")
+        st.write("#" * 50)
+        st.write("Model:", model_name)
+        st.write("Accuracy:", accuracy)
+        st.write("Precision:", precision)
+        st.write("Recall:", recall)
+        st.write("F1-score:", f1)
+
+    # Chọn thuật toán để huấn luyện
+    selected_model = st.selectbox("Select a model", ['XGBoost', 'Decision Tree', 'SVM (linear kernel)',
+                                                        'SVM (RBF kernel)', 'Ensemble (Voting)', 'Ensemble (Bagging)', 'Ensemble (AdaBoost)',
+                                                        'MultinomialNB'])
+
+    if st.button("Train Model"):
+        # Chia dữ liệu thành tập huấn luyện và tập kiểm tra
+        X_train, X_test, y_train, y_test = train_test_split(X_tf, y_encoder, test_size=0.2, random_state=42)
+
+        # Huấn luyện mô hình được chọn
+        train_model(X_train, X_test, y_train, y_test, selected_model)
+
+    st.markdown('''- Nhận xét :  
+    - Kết quả của các hình điều cho các nhận định rất cao, nhưng cá nhân thấy vẫn chưa đáp ứng chính xác tùy theo nhu cầu.
+    - Dựa theo mục đích, chiến lược, sản phẩm và đối tượng có thể tinh chỉnh lại đặc trưng lấy theo yêu câu.  ''')
+
 
 # Trang 4: Người dùng tự nhập
 def page_user_input():
     st.title("Người dùng tự nhập")
     st.write("Trang này cho phép người dùng tự nhập văn bản để dự đoán sentiment.")
-    user_input = st.text_area("Nhập văn bản của bạn", "")
-    # Xử lý văn bản người dùng và gọi mô hình để dự đoán sentiment (tuỳ chọn)
+    st.title("Tạo dữ liệu nội dung và đánh giá")
+
+    # Tạo các trường nhập liệu cho nội dung và đánh giá
+    content = st.text_input("Nhập nội dung:")
+    rating = st.slider("Đánh giá:", min_value=1, max_value=5, step=1)
+
+    # Tạo dataframe để lưu trữ dữ liệu
+    data = pd.DataFrame(columns=["content", "rating"])
+
+    # Hiển thị dữ liệu đã nhập và cho phép người dùng thêm vào dataframe
+    if st.button("Thêm vào dữ liệu"):
+        row = pd.DataFrame({"content": [content], "rating": [rating]})
+        data = pd.concat([data, row], ignore_index=True)
+        st.success("Dữ liệu đã được thêm vào thành công.")
+
+    # Hiển thị dữ liệu đã thu thập
+    st.subheader("Dữ liệu đã thu thập:")
+    st.write(data)
+
+    data_clean = f_clean_test.step_clean(data)
+    data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
+    st.dataframe(data_clean)
+    # Đường dẫn tới file chứa mô hình đã lưu
+    tfidf_model = joblib.load('TfidfVectorizer.pkl')
+    # Chuyển đổi văn bản thành vector TF-IDF
+    matrix = tfidf_model.transform(data_clean['words'])
+    df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
+    df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
+    st.dataframe(df_input)
+    st.write(data_clean['rating_new'].dtypes)
+    # Đường dẫn tới các file chứa các mô hình đã lưu
+    model_paths = {
+        'XGBoost': 'XGBoost.pkl',
+        'Decision Tree': 'Decision_Tree.pkl',
+        'SVM (linear kernel)': 'SVM_(linear_kernel).pkl',
+        'SVM (RBF kernel)': 'SVM_(RBF_kernel).pkl',
+        'Ensemble (Voting)': 'Ensemble_(Voting).pkl',
+        'Ensemble (Bagging)': 'Ensemble_(Bagging).pkl',
+        'Ensemble (AdaBoost)': 'Ensemble_(AdaBoost).pkl',
+        'MultinomialNB': 'MultinomialNB.pkl'
+    }
+
+    # Tạo một từ điển để lưu trữ các mô hình
+    models = {}
+
+    # Tải các mô hình từ các file
+    for model_name, model_path in model_paths.items():
+        models[model_name] = joblib.load(model_path)
+
+    # Hiển thị selectbox để chọn mô hình
+    selected_model = st.selectbox("Select a model", list(model_paths.keys()))
+    # Sử dụng mô hình để dự đoán
+    model = models[selected_model]
+    # result = model.predict(df_input)
+    proba = model.predict_proba(df_input)
+    st.write(proba)
+    positive_prob = proba[:, 1]  # Lấy xác suất của lớp positive
+    threshold = 0.5  # Ngưỡng để quyết định kết quả dự đoán
+    result = positive_prob > threshold
+    if result:
+        st.write("Kết quả: ", emoji.emojize(":smile:"))
+    else:
+        st.write("Kết quả: ", emoji.emojize(":angry:"))
 
 # Thiết lập giao diện ứng dụng Streamlit
 def main():
