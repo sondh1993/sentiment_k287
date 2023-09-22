@@ -8,3 +8,6 @@ scikit-learn
 wordcloud==1.8.1
 regex
 underthesea
+xgboost
+imblearn
+joblib
