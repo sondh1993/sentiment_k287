@@ -374,7 +374,36 @@ def page_training():
 def page_user_input():
     st.title("Người dùng tự nhập")
     st.write("Trang này cho phép người dùng tự nhập văn bản để dự đoán sentiment.")
-    st.title("Tạo dữ liệu nội dung và đánh giá")
+    # Đường dẫn tới các file chứa các mô hình đã lưu
+    model_paths = {
+        'XGBoost': 'XGBoost.pkl',
+        'Decision Tree': 'Decision_Tree.pkl',
+        'SVM (linear kernel)': 'SVM_(linear_kernel).pkl',
+        'SVM (RBF kernel)': 'SVM_(RBF_kernel).pkl',
+        'Ensemble (Voting)': 'Ensemble_(Voting).pkl',
+        'Ensemble (Bagging)': 'Ensemble_(Bagging).pkl',
+        'Ensemble (AdaBoost)': 'Ensemble_(AdaBoost).pkl',
+        'MultinomialNB': 'MultinomialNB.pkl'
+    }
+    
+    # Tạo một từ điển để lưu trữ các mô hình
+    models = {}
+
+    # Tải các mô hình từ các file
+    for model_name, model_path in model_paths.items():
+        models[model_name] = joblib.load(model_path)
+    # Hàm dự đoán kết quả
+    def predict_result(model, data):
+        data_clean = f_clean_test.step_clean(data)
+        data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
+        tfidf_model = joblib.load('TfidfVectorizer.pkl')
+        matrix = tfidf_model.transform(data_clean['words'])
+        df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
+        df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
+        result = model.predict(df_input)
+        return result
+    # Hiển thị selectbox để chọn mô hình
+    selected_model = st.selectbox("Select a model", list(model_paths.keys()))
 
     # Tạo các trường nhập liệu cho nội dung và đánh giá
     content = st.text_input("Nhập nội dung:")
@@ -392,49 +421,18 @@ def page_user_input():
     # Hiển thị dữ liệu đã thu thập
     st.subheader("Dữ liệu đã thu thập:")
     st.write(data)
-    # Đường dẫn tới các file chứa các mô hình đã lưu
-    model_paths = {
-        'XGBoost': 'XGBoost.pkl',
-        'Decision Tree': 'Decision_Tree.pkl',
-        'SVM (linear kernel)': 'SVM_(linear_kernel).pkl',
-        'SVM (RBF kernel)': 'SVM_(RBF_kernel).pkl',
-        'Ensemble (Voting)': 'Ensemble_(Voting).pkl',
-        'Ensemble (Bagging)': 'Ensemble_(Bagging).pkl',
-        'Ensemble (AdaBoost)': 'Ensemble_(AdaBoost).pkl',
-        'MultinomialNB': 'MultinomialNB.pkl'
-    }
-    data_clean = f_clean_test.step_clean(data)
-    data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
-    st.dataframe(data_clean)
-    # Đường dẫn tới file chứa mô hình đã lưu
-    tfidf_model = joblib.load('TfidfVectorizer.pkl')
-    # Chuyển đổi văn bản thành vector TF-IDF
-    matrix = tfidf_model.transform(data_clean['words'])
-    df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
-    df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
-    st.dataframe(df_input)
-    st.write(data_clean['rating_new'].dtypes)
-    # Tạo một từ điển để lưu trữ các mô hình
-    models = {}
+    # Kiểm tra và dự đoán kết quả nếu có dữ liệu
+    if not data.empty:
+        model = models[selected_model]
+        result = predict_result(model, data)
 
-    # Tải các mô hình từ các file
-    for model_name, model_path in model_paths.items():
-        models[model_name] = joblib.load(model_path)
-
-    # Hiển thị selectbox để chọn mô hình
-    selected_model = st.selectbox("Select a model", list(model_paths.keys()))
-    # Sử dụng mô hình để dự đoán
-    model = models[selected_model]
-    # result = model.predict(df_input)
-    proba = model.predict_proba(df_input)
-    st.write(proba)
-    positive_prob = proba[:, 1]  # Lấy xác suất của lớp positive
-    threshold = 0.5  # Ngưỡng để quyết định kết quả dự đoán
-    result = positive_prob > threshold
-    if result:
-        st.write("Kết quả: ", emoji.emojize(":smile:"))
-    else:
-        st.write("Kết quả: ", emoji.emojize(":angry:"))
+        # Hiển thị kết quả dự đoán
+        st.write("Kết quả dự đoán:")
+        for i in range(len(result)):
+            if result[i] == 1:
+                st.write(f"Dòng {i + 1}: ", emoji.emojize(":smile:"))
+            else:
+                st.write(f"Dòng {i + 1}: ", emoji.emojize(":angry:"))
 
 # Thiết lập giao diện ứng dụng Streamlit
 def main():
