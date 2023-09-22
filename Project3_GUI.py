@@ -239,11 +239,11 @@ def page_algorithm():
         word_freqs[sentiment] = (words, frequencies)
 
     # Create bar plots for word frequencies in each sentiment
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 10))
 
     for i, sentiment in enumerate(sentiments):
         words, frequencies = word_freqs[sentiment]
-        ax = axes[i // 2, i % 2]
+        ax = axes[i]
         ax.bar(words, frequencies)
         ax.set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
         ax.set_xlabel('Words')
