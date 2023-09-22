@@ -16,18 +16,19 @@ def missing_value_analysis(df):
     ratio_ = (df[na_col].isnull().sum() / df.shape[0]*100).sort_values(ascending=True)
     miss_df = pd.concat([n_miss, np.round(ratio_, 2)], axis=1, keys=["Missing values", "Ratio"])
     miss_df = pd.DataFrame(miss_df)
-    return(miss_df)
+    return miss_df
 
 def check_data(df, head=5, tail=5):
-    print("SHAPE".center(82,'~'))
-    print("Rows: {}".format(df.shape[0]))
-    print("columns: {}".format(df.shape[1]))
-    print("TYPES".center(82,'~'))
-    print(df.info())
-    print("".center(82,'~'))
-    print(missing_value_analysis(df))
-    print("Duplicated values".center(82,'~'))
-    print(df.duplicated().sum())
+    st.write("SHAPE".center(82, '~'))
+    st.write("Rows: {}".format(df.shape[0]))
+    st.write("Columns: {}".format(df.shape[1]))
+    st.write("TYPES".center(82, '~'))
+    st.write(df.info())
+    st.write("".center(82, '~'))
+    miss_df = missing_value_analysis(df)
+    st.table(miss_df)
+    st.write("Duplicated values".center(82, '~'))
+    st.write(df.duplicated().sum())
 def file_to_dict(path):
     file = open(path, 'r', encoding = 'utf-8')
     lst = file.read().split('\n')
@@ -82,7 +83,7 @@ def page_algorithm():
     # Hiển thị dữ liệu
     st.write("Dữ liệu được đọc:")
     st.write(df)
-    st.code(check_data(df))
+    check_data(df)
     st.write("Một số thông tin từ dữ liệu qua biểu đồ")
     ax = df['rating'].value_counts().sort_index().plot(kind='bar',
                                                        title='Count of Reviews by Rating', figsize=(10,5))
