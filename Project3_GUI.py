@@ -195,8 +195,8 @@ def page_algorithm():
             # Lưu dữ liệu đã xử lý vào file
             df_sub.to_csv(processed_file_path, index=False)
 
-        st.success("Đã hoàn thành xử lý dữ liệu!")
-
+    st.success("Đã hoàn thành xử lý dữ liệu!")
+    st.dataframe(df_sub.sample(10))
     st.title("Word Cloud and Bar Plot")
 
     # # Generate word clouds from positive, negative, and neutral text
