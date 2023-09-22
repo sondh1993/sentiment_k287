@@ -171,12 +171,12 @@ def page_algorithm():
     uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
     if uploaded_file is not None:
         # Kiểm tra xem có file đã xử lý sẵn hay không
-        processed_file_path = "processed_data.csv"
+        processed_file_path = "project3_clean.csv"
         if os.path.exists(processed_file_path):
             use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
             if use_processed_file:
                 # Đọc dữ liệu từ file đã xử lý sẵn
-                df_sub = pd.read_csv("project3_clean.csv",)
+                df_sub = pd.read_csv(processed_file_path)
             else:
                 # Đọc dữ liệu từ file tải lên
                 df_sub = pd.read_csv(uploaded_file)
