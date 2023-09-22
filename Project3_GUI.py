@@ -211,44 +211,44 @@ def page_algorithm():
 
     
     
-    st.title("Word Cloud and Bar Plot")
+    st.title("Word Cloud and Bar Plot of Text cleaning")
 
-    # # Generate word clouds from positive, negative, and neutral text
-    # sentiments = ['positive', 'negative']
-    # wordclouds = {}
-    # for sentiment in sentiments:
-    #     wordcloud = WordCloud(background_color='white', collocations=False).generate(globals()[f'{sentiment}_text'])
-    #     wordclouds[sentiment] = wordcloud
+    # Generate word clouds from positive, negative, and neutral text
+    sentiments = ['positive', 'negative']
+    wordclouds = {}
+    for sentiment in sentiments:
+        wordcloud = WordCloud(background_color='white', collocations=False).generate(globals()[f'{sentiment}_text'])
+        wordclouds[sentiment] = wordcloud
 
-    # # Plot and save word clouds
-    # for sentiment, wordcloud in wordclouds.items():
-    #     plt.figure(figsize=(8, 6))
-    #     plt.imshow(wordcloud, interpolation='bilinear')
-    #     plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
-    #     plt.axis('off')
-    #     st.pyplot(plt)  # Hiển thị word cloud trong Streamlit
+    # Plot and save word clouds
+    for sentiment, wordcloud in wordclouds.items():
+        plt.figure(figsize=(8, 6))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
+        plt.axis('off')
+        st.pyplot(plt)  # Hiển thị word cloud trong Streamlit
 
-    # # Get word frequencies from word clouds
-    # word_freqs = {}
-    # for sentiment, wordcloud in wordclouds.items():
-    #     word_freq = wordcloud.words_
-    #     sorted_word_freq = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
-    #     top_words = sorted_word_freq[:10]
-    #     words = [word[0] for word in top_words]
-    #     frequencies = [word[1] for word in top_words]
-    #     word_freqs[sentiment] = (words, frequencies)
+    # Get word frequencies from word clouds
+    word_freqs = {}
+    for sentiment, wordcloud in wordclouds.items():
+        word_freq = wordcloud.words_
+        sorted_word_freq = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+        top_words = sorted_word_freq[:10]
+        words = [word[0] for word in top_words]
+        frequencies = [word[1] for word in top_words]
+        word_freqs[sentiment] = (words, frequencies)
 
-    # # Create bar plots for word frequencies in each sentiment
-    # fig, axes = plt.subplots(1, len(sentiments), figsize=(12, 6))
+    # Create bar plots for word frequencies in each sentiment
+    fig, axes = plt.subplots(1, len(sentiments), figsize=(12, 6))
 
-    # for i, sentiment in enumerate(sentiments):
-    #     words, frequencies = word_freqs[sentiment]
-    #     axes[i].bar(words, frequencies)
-    #     axes[i].set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
-    #     axes[i].set_xlabel('Words')
-    #     axes[i].set_ylabel('Frequency')
-    #     axes[i].tick_params(axis='x', rotation=90)
-    #     st.pyplot(fig)
+    for i, sentiment in enumerate(sentiments):
+        words, frequencies = word_freqs[sentiment]
+        axes[i].bar(words, frequencies)
+        axes[i].set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
+        axes[i].set_xlabel('Words')
+        axes[i].set_ylabel('Frequency')
+        axes[i].tick_params(axis='x', rotation=90)
+        st.pyplot(fig)
 
 
 # Trang 3: Huấn luyện model và kết quả mẫu
