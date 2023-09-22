@@ -169,7 +169,6 @@ def page_algorithm():
     st.title("Xử lý dữ liệu")
 
     # Tạo nút "Tải lên dữ liệu"
-    uploaded_file = st.file_uploader("Tải lên tệp tin CSV", type="csv")
     if uploaded_file is not None:
         # Kiểm tra xem có file đã xử lý sẵn hay không
         processed_file_path = "project3_clean.csv"
