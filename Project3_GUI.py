@@ -213,20 +213,21 @@ def page_algorithm():
     
     st.title("Word Cloud and Bar Plot of Text cleaning")
 
-    # Generate word clouds from positive, negative, and neutral text
-    sentiments = df_sub('sentiment')['positive', 'negative']
+    sentiments = ['positive', 'negative']
     wordclouds = {}
+
     for sentiment in sentiments:
-        wordcloud = WordCloud(background_color='white', collocations=False).generate(globals()[f'{sentiment}_text'])
+        sentiment_text = df_sub[df_sub['sentiment'] == sentiment]['text'].to_string(index=False)
+        wordcloud = WordCloud(background_color='white', collocations=False).generate(sentiment_text)
         wordclouds[sentiment] = wordcloud
 
-    # Plot and save word clouds
+    # Hiển thị word clouds trong Streamlit
     for sentiment, wordcloud in wordclouds.items():
         plt.figure(figsize=(8, 6))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
         plt.axis('off')
-        st.pyplot(plt)  # Hiển thị word cloud trong Streamlit
+        st.pyplot(plt)
 
     # Get word frequencies from word clouds
     word_freqs = {}
