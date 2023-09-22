@@ -38,6 +38,7 @@ negative_words_dict = file_to_list(r'negative_words_list.txt')
 emoji_dict = file_to_dict(r'emojicon.txt')
 teen_dict = file_to_dict(r'teencode.txt')
 envi_dict = file_to_dict(r'english-vnmese.txt')
+df_clean = pd.read_csv("project3_clean.csv")
 # Trang 1: Giới thiệu tổng quát về model
 def page_intro():
     st.title("Project : Dự đoán Sentiment")
@@ -175,7 +176,7 @@ def page_algorithm():
             use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
             if use_processed_file:
                 # Đọc dữ liệu từ file đã xử lý sẵn
-                df_sub = pd.read_csv(processed_file_path)
+                df_sub = pd.read_csv("project3_clean.csv",)
             else:
                 # Đọc dữ liệu từ file tải lên
                 df_sub = pd.read_csv(uploaded_file)
