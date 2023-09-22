@@ -224,7 +224,7 @@ def step_clean(df_sub):
     df_sub['positive'] = df_sub['positive_emoji_count'] + df_sub['positive_words_count']
     df_sub['negative'] = df_sub['negative_emoji_count'] + df_sub['negative_words_count']
     # thêm cột mới rating_new
-    df_sub['rating_new'] = np.where(df_sub['positive'] > df_sub['negative'], df_sub['rating']+1, df_sub['rating'] -1 )
+    df_sub['rating_new'] = df_sub.apply(lambda row: row['rating'] + 1 if row['positive'] > row['negative'] else row['rating'] - 1, axis=1)
     # Tạo cột mới sentiment kết hơp từ rating 
     df_sub['sentiment'] = df_sub['rating_new'].apply(lambda x: 'positive' if x >= 4 else 'negative' if x <= 2 else 'neutal')
     # Xóa dữ liệu thiếu
