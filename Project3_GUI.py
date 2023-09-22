@@ -170,12 +170,17 @@ def page_algorithm():
     # Tạo nút "Tải lên dữ liệu"
     # Kiểm tra xem có file đã xử lý sẵn hay không
     processed_file_path = "project3_clean.csv"
-    if os.path.exists(processed_file_path):
-        use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn", value=True)
-        if use_processed_file:
+    use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn", value=True)
+
+    if use_processed_file:
+        if os.path.exists(processed_file_path):
             # Đọc dữ liệu từ file đã xử lý sẵn
             df_sub = pd.read_csv(processed_file_path)
         else:
+            st.write("File đã xử lý sẵn không tồn tại.")
+    else:
+        uploaded_file = st.file_uploader("Tải lên file dữ liệu")
+        if uploaded_file is not None:
             # Đọc dữ liệu từ file tải lên
             df_sub = pd.read_csv(uploaded_file)
 
@@ -184,15 +189,8 @@ def page_algorithm():
 
             # Lưu dữ liệu đã xử lý vào file
             df_sub.to_csv(processed_file_path, index=False)
-    else:
-        # Đọc dữ liệu từ file tải lên
-        df_sub = pd.read_csv(uploaded_file)
-
-        # Thực hiện xử lý dữ liệu
-        process_text(df_sub)
-
-        # Lưu dữ liệu đã xử lý vào file
-        df_sub.to_csv(processed_file_path, index=False)
+        else:
+            st.write("Vui lòng tải lên file dữ liệu.")
 
     st.success("Đã hoàn thành xử lý dữ liệu!")
     st.dataframe(df_sub.sample(10))
