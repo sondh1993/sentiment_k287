@@ -10,6 +10,24 @@ import f_clean_test
 import time
 import os
 
+def missing_value_analysis(df):
+    na_col = [col for col in df.columns if df[col].isnull().sum() > 0]
+    n_miss = df[na_col].isnull().sum().sort_values(ascending=True)
+    ratio_ = (df[na_col].isnull().sum() / df.shape[0]*100).sort_values(ascending=True)
+    miss_df = pd.concat([n_miss, np.round(ratio_, 2)], axis=1, keys=["Missing values", "Ratio"])
+    miss_df = pd.DataFrame(miss_df)
+    return(miss_df)
+
+def check_data(df, head=5, tail=5):
+    print("SHAPE".center(82,'~'))
+    print("Rows: {}".format(df.shape[0]))
+    print("columns: {}".format(df.shape[1]))
+    print("TYPES".center(82,'~'))
+    print(df.info())
+    print("".center(82,'~'))
+    print(missing_value_analysis(df))
+    print("Duplicated values".center(82,'~'))
+    print(df.duplicated().sum())
 def file_to_dict(path):
     file = open(path, 'r', encoding = 'utf-8')
     lst = file.read().split('\n')
@@ -64,6 +82,7 @@ def page_algorithm():
     # Hiển thị dữ liệu
     st.write("Dữ liệu được đọc:")
     st.write(df)
+    st.code(check_data(df))
     st.write("Một số thông tin từ dữ liệu qua biểu đồ")
     ax = df['rating'].value_counts().sort_index().plot(kind='bar',
                                                        title='Count of Reviews by Rating', figsize=(10,5))
@@ -179,7 +198,7 @@ def page_algorithm():
             df_sub = pd.read_csv(processed_file_path)
             st.dataframe(df_sub.sample(10))
         else:
-            st.write("File đã xử lý sẵn không tồn tại.")
+            st.write("File đã xử lý sẵn không tồn tại.")s
     else:
         uploaded_file = st.file_uploader("Tải lên file dữ liệu")
         if uploaded_file is not None:
