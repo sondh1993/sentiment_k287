@@ -198,7 +198,7 @@ def page_algorithm():
             df_sub = pd.read_csv(processed_file_path)
             st.dataframe(df_sub.sample(10))
         else:
-            st.write("File đã xử lý sẵn không tồn tại.")s
+            st.write("File đã xử lý sẵn không tồn tại.")
     else:
         uploaded_file = st.file_uploader("Tải lên file dữ liệu")
         if uploaded_file is not None:
