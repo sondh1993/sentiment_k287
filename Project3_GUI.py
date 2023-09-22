@@ -214,7 +214,7 @@ def page_algorithm():
     st.title("Word Cloud and Bar Plot of Text cleaning")
 
     # Generate word clouds from positive, negative, and neutral text
-    sentiments = ['positive', 'negative']
+    sentiments = df_sub('sentiment')['positive', 'negative']
     wordclouds = {}
     for sentiment in sentiments:
         wordcloud = WordCloud(background_color='white', collocations=False).generate(globals()[f'{sentiment}_text'])
