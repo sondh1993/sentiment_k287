@@ -9,6 +9,19 @@ from wordcloud import WordCloud
 import f_clean_test
 import time
 import os
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import LabelEncoder
+import joblib
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.ensemble import GradientBoostingClassifier, AdaBoostClassifier, RandomForestClassifier, VotingClassifier, BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+import xgboost as xgb
+from imblearn.over_sampling import RandomOverSampler
 
 def missing_value_analysis(df):
     na_col = [col for col in df.columns if df[col].isnull().sum() > 0]
@@ -53,6 +66,11 @@ emoji_dict = file_to_dict(r'emojicon.txt')
 teen_dict = file_to_dict(r'teencode.txt')
 envi_dict = file_to_dict(r'english-vnmese.txt')
 df_clean = pd.read_csv("project3_clean.csv")
+
+### dữ liệu chuẩn bị
+df_sub = pd.read_csv("project3_clean.csv")
+
+################################
 # Trang 1: Giới thiệu tổng quát về model
 def page_intro():
     st.title("Project : Dự đoán Sentiment")
@@ -263,7 +281,25 @@ def page_algorithm():
 def page_training():
     st.title("Huấn luyện model")
     st.write("Trang này cho phép người dùng lựa chọn thuật toán và xem kết quả mẫu sau huấn luyện.")
+    st.write("Xử lý cân bằng dữ liệu để đạt được hiểu quả tối ưu .")
+    st.markdown("### Before process data:")
+    st.write(df_sub['sentiment'].value_counts())
+    st.markdown("- Các cột cần giữ lại sau khi xử lý mất cân bằng 'words', 'positive', 'negative', 'rating_new','words_length' ")
+    X = df_sub[['words', 'positive', 'negative', 'rating_new','words_length']]
+    y = df_sub['sentiment']
+    ros = RandomOverSampler()
+    X_resampled , y_resampled = ros.fit_resample(X,y)
+    st.markdown("### After process data:")
+    st.write(y_resampled.value_counts())
     # Thêm các lựa chọn thuật toán (tuỳ chọn)
+    # Menu chọn thuật toán
+    algorithms = ["Thuật toán A", "Thuật toán B", "Thuật toán C"]
+    selected_algorithm = st.selectbox("Chọn thuật toán", algorithms)
+
+    # # Tải mô hình khi có lựa chọn thuật toán
+    # if st.button("Tải mô hình"):
+    #     load_model(selected_algorithm)
+    #     st.success("Mô hình đã được tải thành công!")
     # Thêm kết quả mẫu dữ liệu thử (tuỳ chọn)
 
 # Trang 4: Người dùng tự nhập
