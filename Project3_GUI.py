@@ -174,7 +174,7 @@ def page_algorithm():
         use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
         if use_processed_file:
             # Đọc dữ liệu từ file đã xử lý sẵn
-            df_sub = pd.read_csv(process_text)
+            df_sub = pd.read_csv(processed_file_path)
         else:
             # Đọc dữ liệu từ file tải lên
             df_sub = pd.read_csv(uploaded_file)
