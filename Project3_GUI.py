@@ -245,7 +245,7 @@ def page_algorithm():
         word_freqs[sentiment] = (words, frequencies)
 
     # Create bar plots for word frequencies in each sentiment
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 10))
 
     for i, sentiment in enumerate(sentiments):
         words, frequencies = word_freqs[sentiment]
