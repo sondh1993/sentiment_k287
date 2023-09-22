@@ -403,7 +403,17 @@ def page_user_input():
         'Ensemble (AdaBoost)': 'Ensemble_(AdaBoost).pkl',
         'MultinomialNB': 'MultinomialNB.pkl'
     }
-
+    data_clean = f_clean_test.step_clean(data)
+    data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
+    st.dataframe(data_clean)
+    # Đường dẫn tới file chứa mô hình đã lưu
+    tfidf_model = joblib.load('TfidfVectorizer.pkl')
+    # Chuyển đổi văn bản thành vector TF-IDF
+    matrix = tfidf_model.transform(data_clean['words'])
+    df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
+    df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
+    st.dataframe(df_input)
+    st.write(data_clean['rating_new'].dtypes)
     # Tạo một từ điển để lưu trữ các mô hình
     models = {}
 
@@ -421,18 +431,6 @@ def page_user_input():
     positive_prob = proba[:, 1]  # Lấy xác suất của lớp positive
     threshold = 0.5  # Ngưỡng để quyết định kết quả dự đoán
     result = positive_prob > threshold
-    data_clean = f_clean_test.step_clean(data)
-    data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
-    st.dataframe(data_clean)
-    # Đường dẫn tới file chứa mô hình đã lưu
-    tfidf_model = joblib.load('TfidfVectorizer.pkl')
-    # Chuyển đổi văn bản thành vector TF-IDF
-    matrix = tfidf_model.transform(data_clean['words'])
-    df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
-    df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
-    st.dataframe(df_input)
-    st.write(data_clean['rating_new'].dtypes)
-    
     if result:
         st.write("Kết quả: ", emoji.emojize(":smile:"))
     else:
