@@ -175,7 +175,7 @@ def page_algorithm():
     if use_processed_file:
         if os.path.exists(processed_file_path):
             # Đọc dữ liệu từ file đã xử lý sẵn
-            data_clean = pd.read_csv(processed_file_path)
+            df_sub = pd.read_csv(processed_file_path)
         else:
             st.write("File đã xử lý sẵn không tồn tại.")
     else:
@@ -193,7 +193,7 @@ def page_algorithm():
             st.write("Vui lòng tải lên file dữ liệu.")
 
     st.success("Đã hoàn thành xử lý dữ liệu!")
-    st.dataframe(data_clean.sample(10))
+    st.dataframe(df_sub.sample(10))
     st.title("Word Cloud and Bar Plot")
 
     # # Generate word clouds from positive, negative, and neutral text
