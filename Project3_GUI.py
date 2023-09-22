@@ -221,7 +221,7 @@ def page_algorithm():
 
     # Hiển thị word clouds trong Streamlit
     for sentiment, wordcloud in wordclouds.items():
-        plt.figure(figsize=(8, 6))
+        plt.figure(figsize=(6, 4))
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
         plt.axis('off')
@@ -239,7 +239,7 @@ def page_algorithm():
         word_freqs[sentiment] = (words, frequencies)
 
     # Create bar plots for word frequencies in each sentiment
-    fig, axes = plt.subplots(1, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(1, 2, figsize=(4, 6))
 
     for i, sentiment in enumerate(sentiments):
         words, frequencies = word_freqs[sentiment]
