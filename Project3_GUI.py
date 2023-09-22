@@ -214,7 +214,6 @@ def page_algorithm():
     st.title("Word Cloud and Bar Plot of Text cleaning")
     sentiments = df_sub['sentiment'].unique()
     wordclouds = {}
-
     for sentiment in sentiments:
         sentiment_text = ' '.join(df_sub[df_sub['sentiment'] == sentiment]['content'])
         wordcloud = WordCloud(background_color='white', collocations=False).generate(sentiment_text)
@@ -226,13 +225,8 @@ def page_algorithm():
         plt.imshow(wordcloud, interpolation='bilinear')
         plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
         plt.axis('off')
-        if sentiment == 'negative':
-            st.write('Word Cloud - Negative Sentiment')
-            st.pyplot(plt)
-            st.write('')  # Thêm một dòng trống giữa các biểu đồ
-        elif sentiment == 'positive':
-            st.write('Word Cloud - Positive Sentiment')
-            st.pyplot(plt)
+        st.write(f'Word Cloud - {sentiment.capitalize()} Sentiment')
+        st.pyplot(plt)
 
     # Get word frequencies from word clouds
     word_freqs = {}
@@ -245,7 +239,7 @@ def page_algorithm():
         word_freqs[sentiment] = (words, frequencies)
 
     # Create bar plots for word frequencies in each sentiment
-    fig, axes = plt.subplots(1, 2, figsize=(12, 10))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
     for i, sentiment in enumerate(sentiments):
         words, frequencies = word_freqs[sentiment]
@@ -259,6 +253,7 @@ def page_algorithm():
     # Adjust layout and display the bar plots
     plt.tight_layout()
     st.pyplot(fig)
+    
 
 # Trang 3: Huấn luyện model và kết quả mẫu
 def page_training():
