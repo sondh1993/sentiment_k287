@@ -221,18 +221,18 @@ def page_algorithm():
         wordclouds[sentiment] = wordcloud
 
     # Hiển thị word clouds trong Streamlit
-for sentiment, wordcloud in wordclouds.items():
-    plt.figure(figsize=(8, 6))
-    plt.imshow(wordcloud, interpolation='bilinear')
-    plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
-    plt.axis('off')
-    if sentiment == 'negative':
-        st.write('Word Cloud - Negative Sentiment')
-        st.pyplot(plt)
-        st.write('')  # Thêm một dòng trống giữa các biểu đồ
-    elif sentiment == 'positive':
-        st.write('Word Cloud - Positive Sentiment')
-        st.pyplot(plt)
+    for sentiment, wordcloud in wordclouds.items():
+        plt.figure(figsize=(8, 6))
+        plt.imshow(wordcloud, interpolation='bilinear')
+        plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
+        plt.axis('off')
+        if sentiment == 'negative':
+            st.write('Word Cloud - Negative Sentiment')
+            st.pyplot(plt)
+            st.write('')  # Thêm một dòng trống giữa các biểu đồ
+        elif sentiment == 'positive':
+            st.write('Word Cloud - Positive Sentiment')
+            st.pyplot(plt)
 
     # Get word frequencies from word clouds
     word_freqs = {}
