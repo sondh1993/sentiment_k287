@@ -19,7 +19,7 @@ def missing_value_analysis(df):
     return miss_df
 
 def check_data(df, head=5, tail=5):
-    st.write("~" * 82)
+    st.markdown("~" * 82)
     st.write("SHAPE".center(82))
     st.write("Rows: {}".format(df.shape[0]))
     st.write("Columns: {}".format(df.shape[1]))
