@@ -221,11 +221,17 @@ def page_algorithm():
         wordclouds[sentiment] = wordcloud
 
     # Hiển thị word clouds trong Streamlit
-    for sentiment, wordcloud in wordclouds.items():
-        plt.figure(figsize=(8, 6))
-        plt.imshow(wordcloud, interpolation='bilinear')
-        plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
-        plt.axis('off')
+for sentiment, wordcloud in wordclouds.items():
+    plt.figure(figsize=(8, 6))
+    plt.imshow(wordcloud, interpolation='bilinear')
+    plt.title(f'Word Cloud - {sentiment.capitalize()} Sentiment')
+    plt.axis('off')
+    if sentiment == 'negative':
+        st.write('Word Cloud - Negative Sentiment')
+        st.pyplot(plt)
+        st.write('')  # Thêm một dòng trống giữa các biểu đồ
+    elif sentiment == 'positive':
+        st.write('Word Cloud - Positive Sentiment')
         st.pyplot(plt)
 
     # Get word frequencies from word clouds
@@ -239,16 +245,20 @@ def page_algorithm():
         word_freqs[sentiment] = (words, frequencies)
 
     # Create bar plots for word frequencies in each sentiment
-    fig, axes = plt.subplots(1, len(sentiments), figsize=(12, 6))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
     for i, sentiment in enumerate(sentiments):
         words, frequencies = word_freqs[sentiment]
-        axes[i].bar(words, frequencies)
-        axes[i].set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
-        axes[i].set_xlabel('Words')
-        axes[i].set_ylabel('Frequency')
-        axes[i].tick_params(axis='x', rotation=90)
-        st.pyplot(fig)
+        ax = axes[i // 2, i % 2]
+        ax.bar(words, frequencies)
+        ax.set_title(f'Top 10 Words - {sentiment.capitalize()} Sentiment')
+        ax.set_xlabel('Words')
+        ax.set_ylabel('Frequency')
+        ax.tick_params(axis='x', rotation=90)
+
+    # Adjust layout and display the bar plots
+    plt.tight_layout()
+    st.pyplot(fig)
 
 # Trang 3: Huấn luyện model và kết quả mẫu
 def page_training():
