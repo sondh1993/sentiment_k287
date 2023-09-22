@@ -11,3 +11,4 @@ underthesea
 xgboost
 imblearn
 joblib
+emoji
