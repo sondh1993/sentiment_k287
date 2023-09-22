@@ -171,7 +171,7 @@ def page_algorithm():
     # Kiểm tra xem có file đã xử lý sẵn hay không
     processed_file_path = "project3_clean.csv"
     if os.path.exists(processed_file_path):
-        use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn")
+        use_processed_file = st.checkbox("Sử dụng file đã xử lý sẵn", value=True)
         if use_processed_file:
             # Đọc dữ liệu từ file đã xử lý sẵn
             df_sub = pd.read_csv(processed_file_path)
