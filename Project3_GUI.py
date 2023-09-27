@@ -68,8 +68,26 @@ teen_dict = file_to_dict(r'teencode.txt')
 envi_dict = file_to_dict(r'english-vnmese.txt')
 df_clean = pd.read_csv("project3_clean.csv")
 
-### dữ liệu chuẩn bị
+### dữ liệu đã xử lý = > build project
 df_sub = pd.read_csv("project3_clean.csv")
+
+X = df_sub[['words', 'positive', 'negative', 'rating_new','words_length']]
+y = df_sub['sentiment']
+# xử lý dữ liệu mất cân bằng target
+ros = RandomOverSampler()
+X_resampled , y_resampled = ros.fit_resample(X,y)
+# Cover target
+label_encoder = LabelEncoder()
+y_encoder = label_encoder.fit_transform(y_resampled)
+# Khởi tạo vectorizer
+vec = TfidfVectorizer()
+matrix = vec.fit_transform(X_resampled['words'])
+
+# joblib.dump(vec,'TfidfVectorizer.pkl')
+vec = joblib.load('TfidfVectorizer.pkl')
+df_tfidf = pd.DataFrame(matrix.toarray(), columns=vec.get_feature_names_out())
+X_tf = pd.concat([X_resampled.drop('words', axis=1), df_tfidf], axis=1)
+
 
 ################################
 # Trang 1: Giới thiệu tổng quát về model
@@ -286,22 +304,10 @@ def page_training():
     st.markdown("### Before process data:")
     st.write(df_sub['sentiment'].value_counts())
     st.markdown("- Các cột cần giữ lại sau khi xử lý mất cân bằng 'words', 'positive', 'negative', 'rating_new','words_length' ")
-    X = df_sub[['words', 'positive', 'negative', 'rating_new','words_length']]
-    y = df_sub['sentiment']
-    ros = RandomOverSampler()
-    X_resampled , y_resampled = ros.fit_resample(X,y)
     st.markdown("### After process data:")
     st.write(y_resampled.value_counts())
-    label_encoder = LabelEncoder()
-    y_encoder = label_encoder.fit_transform(y_resampled)
-    # Khởi tạo vectorizer
-    vec = TfidfVectorizer()
-    matrix = vec.fit_transform(X_resampled['words'])
-
-    joblib.dump(vec,'TfidfVectorizer.pkl')
-    df_tfidf = pd.DataFrame(matrix.toarray(), columns=vec.get_feature_names_out())
-    X_tf = pd.concat([X_resampled.drop('words', axis=1), df_tfidf], axis=1)
     st.dataframe(X_tf)
+
     def train_model(X_train, X_test, y_train, y_test, model_name):
         if model_name == 'XGBoost':
             model = xgb.XGBClassifier()
@@ -396,9 +402,8 @@ def page_user_input():
     def predict_result(model, data):
         data_clean = f_clean_test.step_clean(data)
         data_clean = data_clean[['words', 'positive', 'negative', 'rating_new','words_length']]
-        tfidf_model = joblib.load('TfidfVectorizer.pkl')
-        matrix = tfidf_model.transform(data_clean['words'])
-        df_tfidf = pd.DataFrame(matrix.toarray(), columns=tfidf_model.get_feature_names_out())
+        matrix = vec.transform(data_clean['words'])
+        df_tfidf = pd.DataFrame(matrix.toarray(), columns=vec.get_feature_names_out())
         df_input = pd.concat([data_clean.drop('words', axis=1), df_tfidf], axis=1)
         result = model.predict(df_input)
         return result
